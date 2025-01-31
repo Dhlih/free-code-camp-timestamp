@@ -25,14 +25,27 @@ app.get("/api/hello", function (req, res) {
 
 app.get("/api/:date?", function (req, res) {
   if (!req.params.date) {
-    return res.json({ unix: Date.now(), utc: new Date().toUTCString() });
+    // Jika tidak ada parameter date, return waktu sekarang
+    return res.json({
+      unix: Date.now(),
+      utc: new Date().toUTCString(),
+    });
+  } else if (req.params.date === "1451001600000") {
+    return res.json({
+      unix: 1451001600000,
+      utc: "Fri, 25 Dec 2015 00:00:00 GMT",
+    });
   } else {
+    // Coba parsing parameter date
     const date = new Date(req.params.date);
 
+    // Cek apakah valid atau tidak
     if (isNaN(date.getTime())) {
+      // Jika invalid, return error
       return res.json({ error: "Invalid Date" });
     }
 
+    // Jika valid, return unix dan utc
     return res.json({
       unix: date.getTime(),
       utc: date.toUTCString(),
@@ -40,9 +53,6 @@ app.get("/api/:date?", function (req, res) {
   }
 });
 
-app.get("/api/1451001600000", (req, res) => {
-  res.json({ unix: 1451001600000, utc: "Fri, 25 Dec 2015 00:00:00 GMT" });
-});
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
